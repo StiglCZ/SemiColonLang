@@ -102,10 +102,11 @@ namespace Complier{
             for (int i = 0; i < ints.Count; i++) {
                 compiledCode += "int line" + i.ToString() + "();";
             }
-            compiledCode += "\nint main(){\nline0();\nreturn 0;}\n";
+            compiledCode += "\nint main(){\nline0();\nreturn 0;\n}";
             //foreach (List<int> ints1 in ints) {
             
             for (int i = 0; i < ints.Count; i++) {
+                bool jumping = false ;
                 compiledCode += "\nint line" + i.ToString() + "(){\n";
                     if (ints[i].Count > 0)
                     {
@@ -115,7 +116,8 @@ namespace Complier{
                                 compiledCode += "array[" + ints[i][2] + "] =array[" + ints[i][1] + "]";
                                 break;
                             case 2:
-                                compiledCode += "line" + ints[i][1] + "();";
+                                jumping = true;
+                                compiledCode += "line" + ints[i][1] + "();\n";
                                 break;
                             case 3:
                                 switch (ints[i][2]){
@@ -137,7 +139,7 @@ namespace Complier{
                                 case 6:
                                     compiledCode += "if(" + ints[i][1] + " <= " + ints[i][3] + "){line " + ints[i][2].ToString() + "();}";
                                     break;
-                            }
+                                }
 
                                 break;
                             case 4:
@@ -153,15 +155,22 @@ namespace Complier{
                             case 8:
                                 compiledCode += "array[" + ints[i][2] + "] =" + ints[i][1] + ";";
                                 break;
+
                             default:
                                 compiledCode += "\n";
                                 break;
                         }
                     }
-                if (i < ints.Count -1) {
-                    compiledCode += "\nline" + (i + 1).ToString() + "();\n";
+
+                if (i < ints.Count - 1 && !jumping){
+                    compiledCode += "\nline" + (i + 1).ToString() + "();\nreturn 0;\n}";
                 }
-                compiledCode += "exit(0);\nreturn 0;\n}";
+                else if(!jumping){
+                    compiledCode += "exit(0);\nreturn 0;\n}";
+                }
+                else{
+                    compiledCode += "return 0;\n}";
+                }
 
             }
 
