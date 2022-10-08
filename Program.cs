@@ -9,6 +9,7 @@ namespace Complier{
         public bool debug = false;
         List<List<int>> localInts;
         public string output = "compiled.c";
+        public bool jumping = false;
         public static void Main(string[] args) {
             string pathToConfigs = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"/scl/";
             Program program = new Program();
@@ -16,6 +17,7 @@ namespace Complier{
             string complierArgs = "";
             string execution1 = ""; 
             bool delCCode = false;
+            
             string path = "";
             for(int i = 0; i < args.Length; i++){
                 if (args[i] == "-o"|| args[i] == "--out"){
@@ -216,99 +218,10 @@ namespace Complier{
             }
             compiledCode += "\nint main(){\nline0();\nreturn 0;\n}";
             for (int i = 0; i < ints.Count; i++) {
-                bool jumping = false ;
+                 jumping = false ;
                 compiledCode += "\nint line" + i.ToString() + "(){\n";
                     if (ints[i].Count > 0){
-                        switch (ints[i][0]){
-                            case 1:
-                                compiledCode += "array[" + ints[i][2] + "] =array[" + ints[i][1] + "]";
-                                break;
-                            case 2:
-                                jumping = true;
-                                compiledCode += "line" + ints[i][1] + "();\n";
-                                break;
-                            case 3:
-                                switch (ints[i][2]){
-                                case 1:
-                                    compiledCode += "if(array[" + ints[i][1] + "] == array[" + ints[i][3]+"]){line " + ints[i][2].ToString()+"();}";
-                                    break;
-                                case 2:
-                                    compiledCode += "if(array[" + ints[i][1] + "] != array[" + ints[i][3] + "]){line" + ints[i][2].ToString() + "();}";
-                                    break;
-                                case 3:
-                                    compiledCode += "if(array[" + ints[i][1] + "] > array[" + ints[i][3] + "]){line" + ints[i][2].ToString() + "();}";
-                                    break;
-                                case 4:
-                                    compiledCode += "if(array[" + ints[i][1] + "] < array[" + ints[i][3] + "]){line" + ints[i][2].ToString() + "();}";
-                                    break;
-                                case 5:
-                                    compiledCode += "if(array[" + ints[i][1] + "] >= array[" + ints[i][3] + "]){line" + ints[i][2].ToString() + "();}";
-                                    break;
-                                case 6:
-                                    compiledCode += "if(" + ints[i][1] + " <= array[" + ints[i][3] + "]){line" + ints[i][2].ToString() + "();}";
-                                    break;
-                                }
-
-                                break;
-                            case 4:
-                                switch (ints[i][2]){
-                                case 1:
-                                    compiledCode += "array[" + ints[i][4] + "] = array[" + ints[i][1]  + "] + array[" + ints[i][3] + "];"; 
-                                    break;
-                                case 2:
-                                    compiledCode += "array[" + ints[i][4] + "] = array[" + ints[i][1] + "] - array[" + ints[i][3] + "];";
-                                    break;
-                                case 3:
-                                    compiledCode += "array[" + ints[i][4] + "] = array[" + ints[i][1] + "] * array[" + ints[i][3] + "];";
-                                    break;
-                                case 4:
-                                    compiledCode += "array[" + ints[i][4] + "] = array[" + ints[i][1] + "] / array[" + ints[i][3] + "];";
-                                    break;
-                                default:
-                                    compiledCode += "array[" + ints[i][4] + "] = array[" + ints[i][1] + "] + array[" + ints[i][3] + "];";
-                                    break;
-                                }
-                            
-
-                                //counting
-                                break;
-                            case 5:
-                                //printing char
-                                compiledCode += "printf(\"%c\",(char)array[" + ints[i][1] + "]);";
-                                break;
-                            case 6:
-                                //exit
-                                compiledCode += "exit(" + ints[i][1] + ");";
-                                break;
-                            case 7:
-                                //input - read character
-                            compiledCode += "char tmp;\nscanf(\"%c\",tmp);\nint tmp2 = (int)tmp; array[ " + ints[i][1] + "] = tmp2;";
-                                break;
-                            case 8:
-                                //copy
-                                compiledCode += "array[" + ints[i][2] + "] =" + ints[i][1] + ";";
-                                break;
-                            case 9:
-                                //numeric input
-                                if (ints[i][2] == 2){
-                                    compiledCode += "int tmp;\nscanf(\"%d\",&tmp);\narray[" + ints[i][1] + "] = tmp;";
-                                }
-                                else if(ints[i][2] == 1){
-                                    compiledCode += "printf(\"%d\",array[" + ints[i][1] + "]); ";
-                                }
-                                break;
-                        //Function
-                        case 10:
-                             
-                            
-                            break;
-                        case 11:
-                            compiledCode += "func" + ints[i][1].ToString() + "();";
-                            break;
-                        default:
-                                compiledCode += "\n";
-                                break;
-                        }
+                    ParseFunc(ints[i]);
                     }
 
                 if (i < ints.Count - 1 && !jumping){
@@ -326,8 +239,100 @@ namespace Complier{
             File.WriteAllText(output, compiledCode);
            // Console.WriteLine(compiledCode);
         }
-        public void ParseFunc(){
+        public void ParseFunc(List<int> ints){
+            switch (ints[0])
+            {
+                case 1:
+                    compiledCode += "array[" + ints[2] + "] =array[" + ints[1] + "]";
+                    break;
+                case 2:
+                    jumping = true;
+                    compiledCode += "line" + ints[1] + "();\n";
+                    break;
+                case 3:
+                    switch (ints[2])
+                    {
+                        case 1:
+                            compiledCode += "if(array[" + ints[1] + "] == array[" + ints[3] + "]){line " + ints[2].ToString() + "();}";
+                            break;
+                        case 2:
+                            compiledCode += "if(array[" + ints[1] + "] != array[" + ints[3] + "]){line" + ints[2].ToString() + "();}";
+                            break;
+                        case 3:
+                            compiledCode += "if(array[" + ints[1] + "] > array[" + ints[3] + "]){line" + ints[2].ToString() + "();}";
+                            break;
+                        case 4:
+                            compiledCode += "if(array[" + ints[1] + "] < array[" + ints[3] + "]){line" + ints[2].ToString() + "();}";
+                            break;
+                        case 5:
+                            compiledCode += "if(array[" + ints[1] + "] >= array[" + ints[3] + "]){line" + ints[2].ToString() + "();}";
+                            break;
+                        case 6:
+                            compiledCode += "if(" + ints[1] + " <= array[" + ints[3] + "]){line" + ints[2].ToString() + "();}";
+                            break;
+                    }
 
+                    break;
+                case 4:
+                    switch (ints[2])
+                    {
+                        case 1:
+                            compiledCode += "array[" + ints[4] + "] = array[" + ints[1] + "] + array[" + ints[3] + "];";
+                            break;
+                        case 2:
+                            compiledCode += "array[" + ints[4] + "] = array[" + ints[1] + "] - array[" + ints[3] + "];";
+                            break;
+                        case 3:
+                            compiledCode += "array[" + ints[4] + "] = array[" + ints[1] + "] * array[" + ints[3] + "];";
+                            break;
+                        case 4:
+                            compiledCode += "array[" + ints[4] + "] = array[" + ints[1] + "] / array[" + ints[3] + "];";
+                            break;
+                        default:
+                            compiledCode += "array[" + ints[4] + "] = array[" + ints[1] + "] + array[" + ints[3] + "];";
+                            break;
+                    }
+                    //counting
+                    break;
+                case 5:
+                    //printing char
+                    compiledCode += "printf(\"%c\",(char)array[" + ints[1] + "]);";
+                    break;
+                case 6:
+                    //exit
+                    compiledCode += "exit(" + ints[1] + ");";
+                    break;
+                case 7:
+                    //input - read character
+                    compiledCode += "char tmp;\nscanf(\"%c\",tmp);\nint tmp2 = (int)tmp; array[ " + ints[1] + "] = tmp2;";
+                    break;
+                case 8:
+                    //copy
+                    compiledCode += "array[" + ints[2] + "] =" + ints[1] + ";";
+                    break;
+                case 9:
+                    //numeric input
+                    if (ints[2] == 2)
+                    {
+                        compiledCode += "int tmp;\nscanf(\"%d\",&tmp);\narray[" + ints[1] + "] = tmp;";
+                    }
+                    else if (ints[2] == 1)
+                    {
+                        compiledCode += "printf(\"%d\",array[" + ints[1] + "]); ";
+                    }
+                    break;
+                //Function
+                case 10:
+
+
+                    break;
+                case 11:
+                    compiledCode += "func" + ints[1].ToString() + "();";
+                    break;
+                default:
+                    compiledCode += "\n";
+                    break;
+            }
         }
         public static string file(string address){
             return File.ReadAllText(address);
