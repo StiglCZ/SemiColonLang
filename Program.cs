@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.Json.Serialization;
+using System.Diagnostics;
 
 namespace Complier{
     class Program {
@@ -15,7 +14,9 @@ namespace Complier{
 
         public static void Main(string[] args) {
             Program program = new Program();
-
+            string complier = "";
+            string complierArgs = "";
+            bool delCCode = false;
             string path = "";
             for(int i = 0; i < args.Length; i++){
                 if (args[i] == "-o"|| args[i] == "--out"){
@@ -24,6 +25,45 @@ namespace Complier{
                 }else if(args[i] == "-i"|| args[i] == "--input"){
                     i++;
                     path = args[i];
+                }else if (args[i] == "-g" || args[i] == "--complier"){
+                    i++;
+                    complier = args[i];
+                }else if (args[i] == "-gp"){
+                    i++;
+                    complierArgs = args[i].Replace("_"," ");
+                }else if(args[i] == "-d" || args[i] == "-delete"){
+                    delCCode = true;
+                }
+                else if (args[i] == "-c" ){
+                    if (args[i + 1] == "new"){
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.WriteLine("Semicolon Lang Configuration utility");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write("Program sl filename:");
+                        string Input = Console.ReadLine();
+                        Console.Write("Output filename:");
+                        string Output = Console.ReadLine();
+                        Console.Write("C complier name:");
+                        string Complier = Console.ReadLine();
+                        Console.Write("Additional compiler arguments:");
+                        string ComplierArgs = Console.ReadLine();
+                        Console.Write("Configuration file path:");
+                        string ConfOut = Console.ReadLine();
+                        Console.Write("Remove c file after compiling");
+                        string all = Input + "|" + Output + "|" + Complier + "|" + ComplierArgs;
+                        File.WriteAllText(ConfOut,all);
+                    }
+                    else if(File.Exists(args[i+1])){
+                        string[] strings = File.ReadAllText(args[i+1]).Split('|');
+                        path = strings[0];
+                        program.output = strings[1];
+                        program.allLines = file(path);
+                        program.Compile();
+                        Process.Start(strings[2], strings[1] +" " +  strings[3]);
+                    }
+                    Environment.Exit(0);
                 }
                 else if (File.Exists(args[i])){
                     path = args[i];
@@ -32,6 +72,15 @@ namespace Complier{
             if (args.Length > 0 && path != ""){
                 program.allLines = file(path);
                 program.Compile();
+                if(complier.Length > 0){
+                    var process = Process.Start(complier,program.output +" " + complierArgs);
+                    if (delCCode){
+                        process.WaitForExit();
+                        File.Delete(program.output);
+                    }
+                }
+                
+
             }
             else{
                 program.Interactive();
@@ -326,7 +375,6 @@ namespace Complier{
                                 break;
                             case 50:
                                 Console.WriteLine("000:" + reg[0]);
-
                                 Console.Write("    1 2 3 4 5 6 7 8 9 0");
                                 for (int j = 0; j < reg.Length; j++){
                                     if (j > 0){
@@ -339,7 +387,6 @@ namespace Complier{
                                         else{
                                             Console.Write("\n" + (j / 10).ToString() + "0:");
                                         }
-
                                     }
                                 }
                                 
