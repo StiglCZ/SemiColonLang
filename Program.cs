@@ -51,9 +51,30 @@ namespace Complier{
                         string ComplierArgs = Console.ReadLine();
                         Console.Write("Configuration file path:");
                         string ConfOut = Console.ReadLine();
-                        Console.Write("Remove c file after compiling");
-                        string all = Input + "|" + Output + "|" + Complier + "|" + ComplierArgs;
+                        a:
+                        Console.Write("Remove c file after compiling[y/n]?");
+                        char del = Console.ReadKey().KeyChar;
+                        if(del == 'y'){
+                            delCCode = true;
+                        }else if(del == 'n'){
+                            Console.Write("\n");
+                            delCCode = false;
+                        }
+                        else{
+                            goto a;
+                        }
+                        string all = Input + "|" + Output + "|" + Complier + "|" + ComplierArgs + "|" + delCCode.ToString();
                         File.WriteAllText(ConfOut,all);
+                    }
+                    else if (args[i+1] == "default"){
+                        path = "code.sl";
+                        program.output = "compiled.c";
+                        program.allLines = file(path);
+                        program.Compile();
+                        var proc = Process.Start("gcc", "compiled.c -o compiled.exe");
+                        proc.WaitForExit();
+                        File.Delete("compiled.c");
+                        
                     }
                     else if(File.Exists(args[i+1])){
                         string[] strings = File.ReadAllText(args[i+1]).Split('|');
@@ -61,7 +82,11 @@ namespace Complier{
                         program.output = strings[1];
                         program.allLines = file(path);
                         program.Compile();
-                        Process.Start(strings[2], strings[1] +" " +  strings[3]);
+                        var proc = Process.Start(strings[2], strings[1] +" " +  strings[3]);
+                        if (strings[4].ToLower() == "true"){
+                            proc.WaitForExit();
+                            File.Delete(strings[1]);
+                        }
                     }
                     Environment.Exit(0);
                 }
@@ -75,6 +100,7 @@ namespace Complier{
                 if(complier.Length > 0){
                     var process = Process.Start(complier,program.output +" " + complierArgs);
                     if (delCCode){
+                        
                         process.WaitForExit();
                         File.Delete(program.output);
                     }
