@@ -4,7 +4,7 @@
 
 ## Instructions:
 ```
-Instruction|    Arguments
+Instruction     Arguments
 mov   ;         from, to address					
 jump  ;;        command number
 if    ;;;       address, operator, address2, where to jump if true
