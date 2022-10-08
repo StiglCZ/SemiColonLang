@@ -11,11 +11,26 @@ namespace Complier{
         public string allLines;
         public bool debug = false;
         List<List<int>> localInts;
+        public string output = "compiled.c";
 
         public static void Main(string[] args) {
             Program program = new Program();
-            if (args.Length > 0){
-                program.allLines = file(args[0]);
+
+            string path = "";
+            for(int i = 0; i < args.Length; i++){
+                if (args[i] == "-o"|| args[i] == "--out"){
+                    i++;
+                    program.output = args[i];       
+                }else if(args[i] == "-i"|| args[i] == "--input"){
+                    i++;
+                    path = args[i];
+                }
+                else if (File.Exists(args[i])){
+                    path = args[i];
+                }
+            }
+            if (args.Length > 0 && path != ""){
+                program.allLines = file(path);
                 program.Compile();
             }
             else{
@@ -215,12 +230,15 @@ namespace Complier{
 
             }
 
-            File.WriteAllText("compiled.c", compiledCode);
+            File.WriteAllText(output, compiledCode);
            // Console.WriteLine(compiledCode);
         }
         public static string file(string address){
             return File.ReadAllText(address);
         }
+
+
+
         public void Interactive(){
             int[] reg = new int[1000];
         shellinit:
@@ -286,7 +304,7 @@ namespace Complier{
                                 Console.WriteLine("In current moment, jumping trough if is imposible in interactive mode");
                                 break;
                             case 4:
-                                if(ints[2] == 1){ reg[ints[4]] = ints[3] + ints[1]; }
+                                if (ints[2] == 1) { reg[ints[4]] = ints[3] + ints[1]; }
                                 else if (ints[2] == 2) { reg[ints[4]] = ints[3] - ints[1]; }
                                 else if (ints[2] == 3) { reg[ints[4]] = ints[3] * ints[1]; }
                                 else if (ints[2] == 4) { reg[ints[4]] = ints[3] / ints[1]; }
@@ -306,7 +324,26 @@ namespace Complier{
                                 break;
                             case 9:
                                 break;
+                            case 50:
+                                Console.WriteLine("000:" + reg[0]);
 
+                                Console.Write("    1 2 3 4 5 6 7 8 9 0");
+                                for (int j = 0; j < reg.Length; j++){
+                                    if (j > 0){
+                                        Console.Write(reg[j] + " ");
+                                    }
+                                    if (j % 10 == 0){
+                                        if (j < 100){
+                                            Console.Write("\n0" + (j / 10).ToString() + "0:");
+                                        }
+                                        else{
+                                            Console.Write("\n" + (j / 10).ToString() + "0:");
+                                        }
+
+                                    }
+                                }
+                                
+                                break;
                             default:
                                 Console.WriteLine("Invalid command");
                                 break;
