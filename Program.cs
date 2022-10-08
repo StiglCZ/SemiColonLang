@@ -6,9 +6,11 @@ namespace Complier{
     class Program {
         public string compiledCode = "";
         public string allLines = "";
-        public bool debug = false;
+        public bool debug = true;
         List<List<int>> localInts;
+        public bool inFunc = false;
         public string output = "compiled.c";
+
         public bool jumping = false;
         public static void Main(string[] args) {
             string pathToConfigs = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"/scl/";
@@ -211,20 +213,22 @@ namespace Complier{
             int[] jpoints = new int[255];
             compiledCode= "#include <stdio.h>\n" +
                 "#include <stdlib.h>\n" +
-                "int array[1000];\n" +
-                "int fns[255];int ufns = 0;\n";
+                "int array[1000];\n";
             for (int i = 0; i < ints.Count; i++) {
                 compiledCode += "int line" + i.ToString() + "();";
             }
             compiledCode += "\nint main(){\nline0();\nreturn 0;\n}";
             for (int i = 0; i < ints.Count; i++) {
                  jumping = false ;
+                inFunc=false;
                 compiledCode += "\nint line" + i.ToString() + "(){\n";
                     if (ints[i].Count > 0){
-                    ParseFunc(ints[i]);
+                    ParseFunc(ints[i],i);
                     }
+                if (inFunc){
 
-                if (i < ints.Count - 1 && !jumping){
+                }
+                else if (i < ints.Count - 1 && !jumping){
                     compiledCode += "\nline" + (i + 1).ToString() + "();\nreturn 0;\n}";
                 }
                 else if(!jumping){
@@ -239,7 +243,7 @@ namespace Complier{
             File.WriteAllText(output, compiledCode);
            // Console.WriteLine(compiledCode);
         }
-        public void ParseFunc(List<int> ints){
+        public void ParseFunc(List<int> ints,int fnNext){
             switch (ints[0])
             {
                 case 1:
@@ -292,6 +296,7 @@ namespace Complier{
                             compiledCode += "array[" + ints[4] + "] = array[" + ints[1] + "] + array[" + ints[3] + "];";
                             break;
                     }
+                
                     //counting
                     break;
                 case 5:
@@ -312,19 +317,34 @@ namespace Complier{
                     break;
                 case 9:
                     //numeric input
-                    if (ints[2] == 2)
-                    {
+                    if (ints[2] == 2){
                         compiledCode += "int tmp;\nscanf(\"%d\",&tmp);\narray[" + ints[1] + "] = tmp;";
                     }
-                    else if (ints[2] == 1)
-                    {
+                    else if (ints[2] == 1){
                         compiledCode += "printf(\"%d\",array[" + ints[1] + "]); ";
                     }
                     break;
                 //Function
                 case 10:
-
-
+                    compiledCode += "\nline" + (fnNext + 1).ToString() + "();\nreturn 0;\n}";
+                    compiledCode += "\nint func" + ints[1] +"(){\n";
+                    
+                    for (int i = 2; i < ints.Count; i++){
+                        List<int> cmd = new List<int>();
+                        for (int j = i; j < ints.Count; j++){
+                            if (ints[j] != 10){
+                                cmd.Add(ints[j]);
+                            }
+                            else{
+                                i = j+1;
+                            }
+                        }
+                        
+                        ParseFunc(cmd, 1);
+                        }
+                    compiledCode += "\nreturn 0;\n}";
+                    
+                    
                     break;
                 case 11:
                     compiledCode += "func" + ints[1].ToString() + "();";
