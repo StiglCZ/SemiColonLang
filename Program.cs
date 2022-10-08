@@ -63,17 +63,14 @@ namespace Complier{
                         a:
                             Console.Write("Remove c file after compiling[y/n]?");
                             char del = Console.ReadKey().KeyChar;
-                            if (del == 'y')
-                            {
+                            if (del == 'y'){
                                 delCCode = true;
                             }
-                            else if (del == 'n')
-                            {
+                            else if (del == 'n'){
                                 Console.Write("\n");
                                 delCCode = false;
                             }
-                            else
-                            {
+                            else{
                                 goto a;
                             }
                             string all = Input + "|" + Output + "|" + Complier + "|" + ComplierArgs + "|" + execution + "|" + delCCode.ToString();
@@ -83,8 +80,7 @@ namespace Complier{
 
                              File.WriteAllText(pathToConfigs + ConfOut, all);
                         }
-                        else if (args[i + 1] == "default")
-                        {
+                        else if (args[i + 1] == "default"){
                             path = "code.sl";
                             program.output = "compiled.c";
                             program.allLines = file(path);
@@ -113,8 +109,7 @@ namespace Complier{
                                 Process.Start(strings[4]);
                             }
                         }
-                        else
-                        {
+                        else{
                             Console.WriteLine("Fatal error: No valid config file found");
                         }
                     }
@@ -212,7 +207,10 @@ namespace Complier{
         }
         public void convertToC(List<List<int>> ints){
             int[] jpoints = new int[255];
-            compiledCode= "#include <stdio.h>\n#include <stdlib.h>\nint array[1000];\n";
+            compiledCode= "#include <stdio.h>\n" +
+                "#include <stdlib.h>\n" +
+                "int array[1000];\n" +
+                "int fns[255];int ufns = 0;\n";
             for (int i = 0; i < ints.Count; i++) {
                 compiledCode += "int line" + i.ToString() + "();";
             }
@@ -299,10 +297,14 @@ namespace Complier{
                                     compiledCode += "printf(\"%d\",array[" + ints[i][1] + "]); ";
                                 }
                                 break;
-                            case 10:
-                                
-                                break;
-
+                        //Function
+                        case 10:
+                             
+                            
+                            break;
+                        case 11:
+                            compiledCode += "func" + ints[i][1].ToString() + "();";
+                            break;
                         default:
                                 compiledCode += "\n";
                                 break;
@@ -323,6 +325,9 @@ namespace Complier{
 
             File.WriteAllText(output, compiledCode);
            // Console.WriteLine(compiledCode);
+        }
+        public void ParseFunc(){
+
         }
         public static string file(string address){
             return File.ReadAllText(address);
@@ -355,8 +360,7 @@ namespace Complier{
                     Compile();
                     Console.WriteLine("Done!");
                 }
-                else
-                {
+                else{
                     line = line.Replace("\n", "");
                     line = line.Replace("\t", "");
                     line = line.Replace(" ", "");

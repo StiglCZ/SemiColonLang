@@ -2,7 +2,7 @@
 
 ## Language made just by semicolons and  curly brackets
 
-## Instructions:
+## Instructions
 ```
 Instruction     Arguments
 mov   ;         from, to address					
@@ -13,15 +13,17 @@ print ;;;;;     Input address(ASCII int)
 exit  ;;;;;;    Exit code
 input ;;;;;;;   outAddress
 copy  ;;;;;;;;  intieger(;;;;; = 5), outAddress
+numIO ;;;;;;;;; Type(1 = I, 2 = O), register number
+
 ```
-## SCL Interactive:
+## SCL Interactive
 ```
 Launch by:
 ./scComplier
 You can use normal commands as in files but in shell
 ```
 
-## Hello world:
+## Hello world
 ```
 {;;;;;;;;{;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;}{;}};
 {;;;;;;;;{;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;}{;;}};
@@ -49,7 +51,7 @@ You can use normal commands as in files but in shell
 	-d -> Automaticly deletes C file after compiling
 	-x [filename] -> change filename of executable when automatic executing after compiling c
 	-c Configuration utility
-## Compilation:
+## Compilation
 	Make the C code by running:
 		./scComplier Program.sl
 	Then compile file by:
