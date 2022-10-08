@@ -2,20 +2,19 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Diagnostics;
-
 namespace Complier{
     class Program {
-        public string compiledCode;
-        public string allLines;
+        public string compiledCode = "";
+        public string allLines = "";
         public bool debug = false;
         List<List<int>> localInts;
         public string output = "compiled.c";
-
         public static void Main(string[] args) {
+            string pathToConfigs = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"/scl/";
             Program program = new Program();
             string complier = "";
             string complierArgs = "";
+            string execution1 = ""; 
             bool delCCode = false;
             string path = "";
             for(int i = 0; i < args.Length; i++){
@@ -34,59 +33,93 @@ namespace Complier{
                 }else if(args[i] == "-d" || args[i] == "-delete"){
                     delCCode = true;
                 }
+                else if (args[i] == "-x" || args[i] == "-exec"){
+                    i++;
+                    execution1 = args[i];
+                }
                 else if (args[i] == "-c" ){
-                    if (args[i + 1] == "new"){
-                        Console.ForegroundColor = ConsoleColor.Black;
-                        Console.BackgroundColor = ConsoleColor.DarkCyan;
-                        Console.WriteLine("Semicolon Lang Configuration utility");
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.BackgroundColor = ConsoleColor.Black;
-                        Console.Write("Program sl filename:");
-                        string Input = Console.ReadLine();
-                        Console.Write("Output filename:");
-                        string Output = Console.ReadLine();
-                        Console.Write("C complier name:");
-                        string Complier = Console.ReadLine();
-                        Console.Write("Additional compiler arguments:");
-                        string ComplierArgs = Console.ReadLine();
-                        Console.Write("Configuration file path:");
-                        string ConfOut = Console.ReadLine();
+                    if (args.Length - i -1 > 0)
+                    {
+                        if (args[i + 1] == "new")
+                        {
+                            Console.ForegroundColor = ConsoleColor.Black;
+                            Console.BackgroundColor = ConsoleColor.DarkCyan;
+                            Console.WriteLine("Semicolon Lang Configuration utility");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write("Program sl filename:");
+                            string Input = Console.ReadLine() + "";
+                            Console.Write("Output filename:");
+                            string Output = Console.ReadLine() + "";
+                            Console.Write("C complier name:");
+                            string Complier = Console.ReadLine() + "";
+                            Console.Write("Additional compiler arguments:");
+                            string ComplierArgs = Console.ReadLine() + "";
+                            Console.Write("Configuration file path:");
+                            string ConfOut = Console.ReadLine() + "";
+                            Console.Write("Path to execute after compilation(empty=dont run):");
+                            string execution = Console.ReadLine() + "";
+
                         a:
-                        Console.Write("Remove c file after compiling[y/n]?");
-                        char del = Console.ReadKey().KeyChar;
-                        if(del == 'y'){
-                            delCCode = true;
-                        }else if(del == 'n'){
-                            Console.Write("\n");
-                            delCCode = false;
+                            Console.Write("Remove c file after compiling[y/n]?");
+                            char del = Console.ReadKey().KeyChar;
+                            if (del == 'y')
+                            {
+                                delCCode = true;
+                            }
+                            else if (del == 'n')
+                            {
+                                Console.Write("\n");
+                                delCCode = false;
+                            }
+                            else
+                            {
+                                goto a;
+                            }
+                            string all = Input + "|" + Output + "|" + Complier + "|" + ComplierArgs + "|" + execution + "|" + delCCode.ToString();
+                            if (!Directory.Exists(pathToConfigs)){
+                                Directory.CreateDirectory(pathToConfigs);
+                            }
+
+                             File.WriteAllText(pathToConfigs + ConfOut, all);
                         }
-                        else{
-                            goto a;
-                        }
-                        string all = Input + "|" + Output + "|" + Complier + "|" + ComplierArgs + "|" + delCCode.ToString();
-                        File.WriteAllText(ConfOut,all);
-                    }
-                    else if (args[i+1] == "default"){
-                        path = "code.sl";
-                        program.output = "compiled.c";
-                        program.allLines = file(path);
-                        program.Compile();
-                        var proc = Process.Start("gcc", "compiled.c -o compiled.exe");
-                        proc.WaitForExit();
-                        File.Delete("compiled.c");
-                        
-                    }
-                    else if(File.Exists(args[i+1])){
-                        string[] strings = File.ReadAllText(args[i+1]).Split('|');
-                        path = strings[0];
-                        program.output = strings[1];
-                        program.allLines = file(path);
-                        program.Compile();
-                        var proc = Process.Start(strings[2], strings[1] +" " +  strings[3]);
-                        if (strings[4].ToLower() == "true"){
+                        else if (args[i + 1] == "default")
+                        {
+                            path = "code.sl";
+                            program.output = "compiled.c";
+                            program.allLines = file(path);
+                            program.Compile();
+                            var proc = Process.Start("gcc", "compiled.c -o compiled.exe");
                             proc.WaitForExit();
-                            File.Delete(strings[1]);
+                            File.Delete("compiled.c");
+                            proc.WaitForExit();
+                            Process.Start("compiled.exe");
                         }
+                        else if (File.Exists(pathToConfigs + args[i + 1])){
+                            string[] strings = File.ReadAllText(pathToConfigs+ args[i + 1]).Split('|');
+                            path = strings[0];
+                            program.output = strings[1];
+                            program.allLines = file(path);
+                            program.Compile();
+                            var proc = Process.Start(strings[2], strings[1] + " " + strings[3]);
+                            if (strings[4] != "" || strings[5].ToLower() == "true")
+                            {
+                                proc.WaitForExit();
+                            }
+                            if (strings[5].ToLower() == "true"){
+                                File.Delete(strings[1]);
+                            }
+                            if (strings[4] != ""){
+                                Process.Start(strings[4]);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Fatal error: No valid config file found");
+                        }
+                    }
+                    else{
+                        Console.Write("Fatal error: No config files");
                     }
                     Environment.Exit(0);
                 }
@@ -99,14 +132,18 @@ namespace Complier{
                 program.Compile();
                 if(complier.Length > 0){
                     var process = Process.Start(complier,program.output +" " + complierArgs);
-                    if (delCCode){
-                        
+                    if(delCCode || execution1 != ""){
                         process.WaitForExit();
+                    }
+                    if (delCCode){
                         File.Delete(program.output);
                     }
+                    if(execution1 != ""){
+                        Process.Start(execution1);
+                    }
+                    
+                    
                 }
-                
-
             }
             else{
                 program.Interactive();
@@ -129,44 +166,31 @@ namespace Complier{
             bool already1 = false;
             List<List<int>> ints1 = new List<List<int>>();
 
-            for (int i = 0; i < code.Length; i++)
-            {
-                if (code[i] == '{')
-                {
+            for (int i = 0; i < code.Length; i++){
+                if (code[i] == '{'){
                     opened++;
                     already1 = true;
                 }
-                else if (code[i] == '}')
-                {
+                else if (code[i] == '}'){
                     opened--;
                 }
-
-                if (already1 && opened == 0)
-                {
+                if (already1 && opened == 0){
                     code[i + 1] = '|';
                     already1 = false;
                     opened = 0;
                 }
             }
             List<string> command = code.ToString().Split('|').ToList();
-
             if (debug) { Console.Write("Values:"); }
-
-                for (int i = 0; i < command.Count; i++)
-                {
+                for (int i = 0; i < command.Count; i++){
                     int x = 0;
                     List<int> ints = new List<int>();
-                    for (int j = 0; j < command[i].Length; j++)
-                    {
-                        if (command[i][j] == ';')
-                        {
-                            for (int k = j; k < command[i].Length; k++)
-                            {
+                    for (int j = 0; j < command[i].Length; j++){
+                        if (command[i][j] == ';'){
+                            for (int k = j; k < command[i].Length; k++){
                                 x++;
-                                if (command[i][k] != ';')
-                                {
-                                    if (x > 1)
-                                    {
+                                if (command[i][k] != ';'){
+                                    if (x > 1){
                                         ints.Add(x - 1);
                                     }
                                     j += x - 1;
@@ -183,15 +207,9 @@ namespace Complier{
                         }
                     }
                 }
-
-            //if (debug){
-                ///Console.WriteLine(code.Replace("|", "\n"));
-            //}
             localInts = ints1;
             return code.ToString(); 
         }
-        
-        
         public void convertToC(List<List<int>> ints){
             int[] jpoints = new int[255];
             compiledCode= "#include <stdio.h>\n#include <stdlib.h>\nint array[1000];\n";
@@ -202,10 +220,8 @@ namespace Complier{
             for (int i = 0; i < ints.Count; i++) {
                 bool jumping = false ;
                 compiledCode += "\nint line" + i.ToString() + "(){\n";
-                    if (ints[i].Count > 0)
-                    {
-                        switch (ints[i][0])
-                        {
+                    if (ints[i].Count > 0){
+                        switch (ints[i][0]){
                             case 1:
                                 compiledCode += "array[" + ints[i][2] + "] =array[" + ints[i][1] + "]";
                                 break;
@@ -326,7 +342,7 @@ namespace Complier{
             while (true){
                 int commandNumber = 0;
                 Console.Write("$");
-                string line = Console.ReadLine();
+                string line = Console.ReadLine() + "";
                 if (line == "" || line == null){
                     goto end;
                 }
@@ -346,17 +362,12 @@ namespace Complier{
                     line = line.Replace(" ", "");
                     int x = 0;
                     List<int> ints = new List<int>();
-                    for (int j = 0; j < line.Length; j++)
-                    {
-                        if (line[j] == ';')
-                        {
-                            for (int k = j; k < line.Length; k++)
-                            {
+                    for (int j = 0; j < line.Length; j++){
+                        if (line[j] == ';'){
+                            for (int k = j; k < line.Length; k++){
                                 x++;
-                                if (line[k] != ';')
-                                {
-                                    if (x > 1)
-                                    {
+                                if (line[k] != ';'){
+                                    if (x > 1){
                                         ints.Add(x - 1);
                                     }
                                     j += x - 1;
@@ -365,10 +376,8 @@ namespace Complier{
                             }
                         }
                     }
-                    if (ints.Count > 0)
-                    {
-                        switch (ints[0])
-                        {
+                    if (ints.Count > 0){
+                        switch (ints[0]){
                             case 1:
                                 reg[ints[2]] = reg[ints[1]];
                                 break;
@@ -415,13 +424,11 @@ namespace Complier{
                                         }
                                     }
                                 }
-                                
                                 break;
                             default:
                                 Console.WriteLine("Invalid command");
                                 break;
                         }
-
                     }
                 }
             end:
