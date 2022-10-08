@@ -1,4 +1,4 @@
-#### Semicolon language (SCL)
+# Semicolon language (SCL)
 
 ## Language made just by semicolons and  curly brackets
 
