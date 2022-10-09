@@ -15,6 +15,7 @@ input ;;;;;;;   outAddress
 copy  ;;;;;;;;  intieger(;;;;; = 5), outAddress
 numIO ;;;;;;;;; Type(1 = I, 2 = O), register number
 funcs ;;;;;;;;;;Create functions
+call  ;*11		FunctionID - Calls function
 ```
 
 ## SCL Interactive
