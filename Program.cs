@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 namespace Complier{
     class Program {
         public string compiledCode = "";
         public string allLines = "";
-        public bool debug = true;
+        public bool debug = false;
         List<List<int>> localInts;
         public bool inFunc = false;
         public string output = "compiled.c";
@@ -214,28 +215,31 @@ namespace Complier{
             compiledCode= "#include <stdio.h>\n" +
                 "#include <stdlib.h>\n" +
                 "int array[1000];\n";
+            for(int i =0; i < 20; i++){
+                compiledCode += "int func" + i + "();";
+            }
+            compiledCode += "\n";
             for (int i = 0; i < ints.Count; i++) {
                 compiledCode += "int line" + i.ToString() + "();";
             }
-            compiledCode += "\nint main(){\nline0();\nreturn 0;\n}";
+            compiledCode += "\nint main(){\n\tline0();\n\treturn 0;\n}";
             for (int i = 0; i < ints.Count; i++) {
                  jumping = false ;
                 inFunc=false;
-                compiledCode += "\nint line" + i.ToString() + "(){\n";
+                compiledCode += "\nint line" + i.ToString() + "(){\n\t";
                     if (ints[i].Count > 0){
                     ParseFunc(ints[i],i);
                     }
                 if (inFunc){
-
                 }
                 else if (i < ints.Count - 1 && !jumping){
-                    compiledCode += "\nline" + (i + 1).ToString() + "();\nreturn 0;\n}";
+                    compiledCode += "\n\tline" + (i + 1).ToString() + "();\n\treturn 0;\n}";
                 }
                 else if(!jumping){
-                    compiledCode += "exit(0);\nreturn 0;\n}";
+                    compiledCode += "exit(0);\n\treturn 0;\n}";
                 }
                 else{
-                    compiledCode += "return 0;\n}";
+                    compiledCode += "\treturn 0;\n}";
                 }
 
             }
@@ -326,25 +330,33 @@ namespace Complier{
                     break;
                 //Function
                 case 10:
-                    compiledCode += "\nline" + (fnNext + 1).ToString() + "();\nreturn 0;\n}";
+                    inFunc = true;
+                    compiledCode += "line" + (fnNext + 1).ToString() + "();\n\treturn 0;\n}";
                     compiledCode += "\nint func" + ints[1] +"(){\n";
-                    
-                    for (int i = 2; i < ints.Count; i++){
-                        List<int> cmd = new List<int>();
-                        for (int j = i; j < ints.Count; j++){
-                            if (ints[j] != 10){
-                                cmd.Add(ints[j]);
+
+                    List<List<int>> cmds = new List<List<int>>();
+                    for(int i = 2; i < ints.Count; i++){
+                        cmds.Add(new List<int>());
+                            for(int j = i; j < ints.Count; j++){
+                            if (ints[j] == 10){
+                                i = j + 1;
+                                j = Int16.MaxValue;
+                                
                             }
                             else{
-                                i = j+1;
+                                cmds[cmds.Count-1].Add(ints[j]);
                             }
-                        }
+                            }
+                    }
+                    cmds.RemoveAt(cmds.Count - 1);
+                    for (int i =0; i < cmds.Count; i++){
+                        compiledCode += "\t";
+                        ParseFunc(cmds[i],-1);
+                        compiledCode += "\n";
                         
-                        ParseFunc(cmd, 1);
-                        }
-                    compiledCode += "\nreturn 0;\n}";
+                    }
                     
-                    
+                    compiledCode += "\treturn 0;\n}";
                     break;
                 case 11:
                     compiledCode += "func" + ints[1].ToString() + "();";
