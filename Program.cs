@@ -341,7 +341,6 @@ namespace Complier{
                             if (ints[j] == 10){
                                 i = j + 1;
                                 j = Int16.MaxValue;
-                                
                             }
                             else{
                                 cmds[cmds.Count-1].Add(ints[j]);

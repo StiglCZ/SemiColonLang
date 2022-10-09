@@ -14,8 +14,9 @@ exit  ;;;;;;    Exit code
 input ;;;;;;;   outAddress
 copy  ;;;;;;;;  intieger(;;;;; = 5), outAddress
 numIO ;;;;;;;;; Type(1 = I, 2 = O), register number
-
+funcs ;;;;;;;;;;Create functions
 ```
+
 ## SCL Interactive
 ```
 Launch by:
@@ -43,7 +44,22 @@ You can use normal commands as in files but in shell
 {;;;;;{;;;}};
 {;;;;;{;;;;;;}};
 ```
+## Functions
+```
+Create function 
+	{;;;;;;;;;;{x}
+	{y}{;;;;;;;;;;}{;;;;;;;;;;}
+	{y}{;;;;;;;;;;}{;;;;;;;;;;}
+	{z}{;;;;;;;;;;}
+	};
+
+	x - Function ID(number)
+	y - Any command(Dont add ; at end of the command)
+	z - Last command of function
+
+```
 ## Arguments
+```
 	-o [filename.c] -> Changes name of compiled C file
 	-i [filename.sl] -> Can be used for changing input file
 	-g [complier] -> Change C compiler name when using C compilation integrated
@@ -51,6 +67,7 @@ You can use normal commands as in files but in shell
 	-d -> Automaticly deletes C file after compiling
 	-x [filename] -> change filename of executable when automatic executing after compiling c
 	-c Configuration utility
+```
 ## Compilation
 	Make the C code by running:
 		./scComplier Program.sl
