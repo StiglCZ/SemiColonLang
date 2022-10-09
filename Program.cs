@@ -155,10 +155,14 @@ namespace Complier{
             convertToC(localInts);
         }
         public void formatCode(){
-            
+            string characters = "abcdefghijklmnopqrstuvwxyz";
+            characters += characters.ToUpper() + "1234567890!@#$%^&*()[]':\",./§?<>";
             allLines = allLines.Replace("\n","");
             allLines = allLines.Replace("\t", "");
             allLines = allLines.Replace(" ", "");
+            for(int i =0; i < characters.Length; i++){
+                allLines = allLines.Replace(characters[i].ToString(),"");
+            }
         }
         public string PrepareString(string source){
             StringBuilder code = new StringBuilder(source);
