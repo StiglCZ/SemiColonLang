@@ -16,6 +16,9 @@ copy  ;;;;;;;;  intieger(;;;;; = 5), outAddress
 numIO ;;;;;;;;; Type(1 = I, 2 = O), register number
 funcs ;;;;;;;;;;Create functions
 call  ;*11		FunctionID - Calls function
+custom;*12		Characters* - Custom C code
+Clib  ;*13		Custom C Library support(chars)
+clear ;*14		Clear the console
 ```
 
 ## SCL Interactive
