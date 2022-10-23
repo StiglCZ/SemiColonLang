@@ -576,6 +576,15 @@ namespace Complier{
                             reg[ints[2]] = ints[1];
                             break;
                         case 9:
+                            if (ints[1] == 1){
+                                Console.WriteLine(reg[ints[2]]);
+                            }else if (ints[2] == 2){
+                                reg[ints[2]] = int.Parse(Console.ReadLine());
+                            }
+
+                            break;
+                        case 14:
+                            Console.Clear();
                             break;
                         case 50:
                             Console.WriteLine("000:" + reg[0]);
