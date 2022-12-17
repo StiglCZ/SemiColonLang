@@ -50,6 +50,9 @@ You can use normal commands as in files but in shell
 ```
 ## Functions
 ```
+Warning: Author still recommends using jumping because functions are bugged at the moment
+```
+```
 Create function 
 	{;;;;;;;;;;{x}
 	{y}{;;;;;;;;;;}{;;;;;;;;;;}
