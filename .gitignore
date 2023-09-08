@@ -4,3 +4,5 @@ bin/
 obj/
 program.asm
 a
+o
+program.o

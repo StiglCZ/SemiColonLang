@@ -98,7 +98,10 @@ class Program{
                               $"\tadd eax, {val[2]*4}\n" +
                               $"\tmov dword [eax], {val[1]}\n";
                     break;
-                
+                case 12:
+                    result = result.Replace($"cmd{--command_counter}:\n","");
+                    result += (char)(val[1]);
+                    break;
             }
         }
         result += "mov eax, 1\n" +

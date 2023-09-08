@@ -49,6 +49,7 @@ You can use normal commands as in files but in shell
 {;;;;;{;;;;;;}};
 ```
 ## Functions
+## Functions are deprecated since the last update
 ```
 Warning: Author still recommends using jumping because functions are bugged at the moment
 ```
