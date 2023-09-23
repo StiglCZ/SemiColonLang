@@ -1,6 +1,8 @@
 # Semicolon language (SCL)
 
+# Update: The language now newly compiles to asm, which means the functions and clib integration was disabled!
 ## Language made just by semicolons and  curly brackets
+
 
 ## Instructions
 ```
